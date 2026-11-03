@@ -1,0 +1,11 @@
+.env
+.venv*/
+__pycache__/
+.DS_Store
+data/raw/
+lake/
+.claude/
+*.mov
+*.mp4
+infra/cdk.out/
+infra/build/

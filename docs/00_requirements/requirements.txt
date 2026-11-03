@@ -1,0 +1,120 @@
+Automated Lead Assignment and Notification System Using AWS and CRM Webhooks
+
+🧩 Problem Statement
+In sales-driven organizations, new leads are typically created via a CRM system (Close). However, there is often a lag between lead creation and assignment of a lead owner (sales representative). This delay can create inefficiencies and missed opportunities if leads are not followed up promptly.
+This project aims to automate the capture of newly created leads via CRM webhooks, wait for a short buffer period (e.g., 10 minutes), and then assign the correct lead owner based on CRM-updated information. The system must also notify the sales team in real time with enriched lead data via Slack or email.
+
+🎯 Objectives
+	•	Capture real-time lead creation events using CRM webhook functionality. 
+	•	Store the lead data in Amazon S3 as raw ingestion storage. 
+	•	Introduce a delay (10 minutes) to allow CRM to assign the lead owner. 
+	•	Perform a lookup against another S3 bucket (containing updated lead-owner mappings). 
+	•	Enrich the lead data with the assigned lead owner and store the data in the S3 bucket 
+	•	Send a notification via Slack or email including the lead's name, ID, Created Date, email, lead owner and the funnel.
+
+🔧 Functional Requirements
+	•	Capture new lead information from CRM webhook in real-time by creating the webhook subscription
+Close Webhook Subscription Documentation : https://developer.close.com/resources/webhook-subscriptions/#create-new-webhook-subscription
+Once you have set up the URL to receive events from the CRM webhook, please reach out to Azmat or Ninad to initiate the creation of the CRM webhook for this project.
+Sample Webhook event for reference  
+{'resource': '/crm', 'path': '/crm', 'httpMethod': 'POST', 'headers': {'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate', 'baggage': 'sentry-trace_id=61a24e3effec455dbbdd7e64cd92ed34,sentry-environment=production,sentry-release=8cc593e4c43631cc,sentry-public_key=244de8807ed34db163a207e1fa1be6e6', 'Close-Sig-Hash': '039d2e5f719c11a63830cf68af480a3eae1f56fb7f39c057927ed68dc432c33d', 'Close-Sig-Timestamp': '1756970837', 'content-type': 'application/json', 'Host': '280utl7289.execute-api.us-east-1.amazonaws.com', 'sentry-trace': '61a24e3effec455dbbdd7e64cd92ed34-9b19a5131ec8a33a', 'User-Agent': 'Close Webhooks 2.0', 'X-Amzn-Trace-Id': 'Root=1-68b93f56-68539cc770cbfba028c12808', 'X-Forwarded-For': '54.186.6.46', 'X-Forwarded-Port': '443', 'X-Forwarded-Proto': 'https'}, 'multiValueHeaders': {'Accept': ['*/*'], 'Accept-Encoding': ['gzip, deflate'], 'baggage': ['sentry-trace_id=61a24e3effec455dbbdd7e64cd92ed34,sentry-environment=production,sentry-release=8cc593e4c43631cc,sentry-public_key=244de8807ed34db163a207e1fa1be6e6'], 'Close-Sig-Hash': ['039d2e5f719c11a63830cf68af480a3eae1f56fb7f39c057927ed68dc432c33d'], 'Close-Sig-Timestamp': ['1756970837'], 'content-type': ['application/json'], 'Host': ['280utl7289.execute-api.us-east-1.amazonaws.com'], 'sentry-trace': ['61a24e3effec455dbbdd7e64cd92ed34-9b19a5131ec8a33a'], 'User-Agent': ['Close Webhooks 2.0'], 'X-Amzn-Trace-Id': ['Root=1-68b93f56-68539cc770cbfba028c12808'], 'X-Forwarded-For': ['54.186.6.46'], 'X-Forwarded-Port': ['443'], 'X-Forwarded-Proto': ['https']}, 'queryStringParameters': None, 'multiValueQueryStringParameters': None, 'pathParameters': None, 'stageVariables': None, 'requestContext': {'resourceId': 'kqvc6w', 'resourcePath': '/crm', 'httpMethod': 'POST', 'extendedRequestId': 'QXbVgFqQIAMEZkw=', 'requestTime': '04/Sep/2025:07:27:18 +0000', 'path': '/deploy/crm', 'accountId': '294845879996', 'protocol': 'HTTP/1.1', 'stage': 'deploy', 'domainPrefix': '280utl7289', 'requestTimeEpoch': 1756970838008, 'requestId': '61ccfc0e-5caa-48e0-acf2-b94a6eb2a814', 'identity': {'cognitoIdentityPoolId': None, 'accountId': None, 'cognitoIdentityId': None, 'caller': None, 'sourceIp': '54.186.6.46', 'principalOrgId': None, 'accessKey': None, 'cognitoAuthenticationType': None, 'cognitoAuthenticationProvider': None, 'userArn': None, 'userAgent': 'Close Webhooks 2.0', 'user': None}, 'domainName': '280utl7289.execute-api.us-east-1.amazonaws.com', 'deploymentId': 't2emw1', 'apiId': '280utl7289'}, 'body': '{"subscription_id": "whsub_1Lr0LeQ56WDreQtJNiuUAr", "event": {"id": "ev_70750rgrOVLfmED9y7ExRy", "date_created": "2025-09-04T07:27:17.674000", "date_updated": "2025-09-04T07:27:17.674000", "organization_id": "orga_rq7EW7TTwnrAshSzIQ49jJUWzDxtTQUBBrA4VoRWElD", "user_id": "user_RoWq89U2oZOlTTfJScR9pTREnX3AAeNdKnw4YOOcYwG", "request_id": "req_6wqaiW5aRzHH0U8jAg8jJI", "api_key_id": null, "oauth_client_id": "oa2client_0RZ3Soibz8n7hqA2D6bmlV", "oauth_scope": "all.full_access offline_access", "object_type": "lead", "object_id": "lead_Q6uqUbqVS4NYyHGJnfxpfNKpZ0roxEDCdD9oIAaMJ4z", "lead_id": "lead_Q6uqUbqVS4NYyHGJnfxpfNKpZ0roxEDCdD9oIAaMJ4z", "action": "created", "changed_fields": [], "meta": {"request_path": "/api/v1/lead/", "request_method": "POST"}, "data": {"date_updated": "2025-09-04T07:27:17.672000+00:00", "addresses": [], "organization_id": "orga_rq7EW7TTwnrAshSzIQ49jJUWzDxtTQUBBrA4VoRWElD", "updated_by": "user_RoWq89U2oZOlTTfJScR9pTREnX3AAeNdKnw4YOOcYwG", "display_name": "Adam Capozzoli", "updated_by_name": "Christopher Garzon", "contact_ids": ["cont_VFH15IJgy9GxEvRNK3VcuZnxR24hb4PJo0COMVKdZ0Q"], "id": "lead_Q6uqUbqVS4NYyHGJnfxpfNKpZ0roxEDCdD9oIAaMJ4z", "name": "", "created_by_name": "Christopher Garzon", "created_by": "user_RoWq89U2oZOlTTfJScR9pTREnX3AAeNdKnw4YOOcYwG", "url": null, "date_created": "2025-09-04T07:27:17.642000+00:00", "status_label": "Potential", "description": "", "status_id": "stat_w883GIAbRCWhns1gvURwAaImLfsmA4SwN5HYLsToMOY", "custom.cf_am3UgCUhyM5iNDtAPL84enDjUrZx1JsyVZ9uD9TbYwG": "YT DE ACADEMY Direct VSL", "custom.cf_DeLLGkRULjyldwA4CA5umg5YrhOT6y0Ex44eycTadS2": "13386968", "custom.cf_7ZWtXzOYPfLduhXb8fCM0m6L2KawUuubVHq12dKgvI9": "_______________________", "custom.cf_jr2d8YqWeVF2GF8UqYTLjnOhCF9N61vUOnTTHrwPcPz": "62330063", "custom.cf_rCyWUZqqs1zp8gS8fk5GTPFgzLBCt6WQhmrSn9tnJMo": "Arizona"}, "previous_data": {}}}', 'isBase64Encoded': False}
+
+	•	Store webhook data in JSON format in Amazon S3 bucket source folder after processing the required details from the webhook event. 
+The name of the file should be as (crm_event_{lead_id}.json) - lead_id can be fetched from the CRM event.
+Sample event data from the CRM Webhook Stored in S3 Bucket - crm_event_lead_niuYPXlw6vnFQIhwZCKDaaKv9XMQs9KA5NgxhNRBgaA.json
+
+{
+"subscription_id": "whsub_1zwvQVQOBPFqrH6xXJEvFJ", 
+"event": {
+"id": "ev_1ntH1vAE4G7DNjNZYkMeck", 
+"date_created": "2025-05-20T12:14:56.446000", 
+"date_updated": "2025-05-20T12:14:56.446000", 
+"organization_id": "orga_rq7EW7TTwnrAshSzIQ49jJUWzDxtTQUBBrA4VoRWElD", "user_id": "user_RoWq89U2oZOlTTfJScR9pTREnX3AAeNdKnw4YOOcYwG", 
+"request_id": "req_1B0t9wF68LfveKOdLNsbVE", 
+"api_key_id": null, 
+"oauth_client_id": "oa2client_0RZ3Soibz8n7hqA2D6bmlV", 
+"oauth_scope": "all.full_access offline_access", 
+"object_type": "lead", "object_id": "lead_niuYPXlw6vnFQIhwZCKDaaKv9XMQs9KA5NgxhNRBgaA", 
+"lead_id": "lead_niuYPXlw6vnFQIhwZCKDaaKv9XMQs9KA5NgxhNRBgaA", 
+"action": "created", 
+"changed_fields": [], 
+"meta": {
+"request_path": "/api/v1/lead/", 
+"request_method": "POST"
+}, 
+"data": {
+"status_id": "stat_w883GIAbRCWhns1gvURwAaImLfsmA4SwN5HYLsToMOY", "display_name": "Lowell Bast", 
+"created_by": "user_RoWq89U2oZOlTTfJScR9pTREnX3AAeNdKnw4YOOcYwG", "created_by_name": "Christopher Garzon", 
+"addresses": [], 
+"name": "", 
+"description": "", 
+"url": null, 
+"contact_ids": ["cont_xASn6XuY8qQuUq6FN919ia9jjg3QvkKXDXx90pytjAE"], "date_updated": "2025-05-20T12:14:56.444000+00:00", 
+"organization_id": "orga_rq7EW7TTwnrAshSzIQ49jJUWzDxtTQUBBrA4VoRWElD", "updated_by": "user_RoWq89U2oZOlTTfJScR9pTREnX3AAeNdKnw4YOOcYwG", 
+"id": "lead_niuYPXlw6vnFQIhwZCKDaaKv9XMQs9KA5NgxhNRBgaA", 
+"updated_by_name": "Christopher Garzon", 
+"status_label": "Potential", 
+"date_created": "2025-05-20T12:14:56.409000+00:00", "custom.cf_am3UgCUhyM5iNDtAPL84enDjUrZx1JsyVZ9uD9TbYwG": "DE ACADEMY Direct VSL", 
+"custom.cf_DeLLGkRULjyldwA4CA5umg5YrhOT6y0Ex44eycTadS2": "13074380", "custom.cf_jr2d8YqWeVF2GF8UqYTLjnOhCF9N61vUOnTTHrwPcPz": "63042928", "custom.cf_rCyWUZqqs1zp8gS8fk5GTPFgzLBCt6WQhmrSn9tnJMo": "Eastern Time (US & Canada)"
+}, 
+"previous_data": {}
+}
+}
+ 
+	•	Implement a 10-minute delay mechanism to provide sufficient time for the CRM system to assign a lead owner before processing the lead further. 
+Utilize an AWS service such as Amazon SQS with a delay to introduce a 10-minute pause, ensuring that newly created leads have an assigned owner in the Close CRM before proceeding.
+For reference : 
+Introducing Delay
+https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-delay-queues.html
+For S3 Event Notification
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/ways-to-add-notification-config-to-bucket.html#step1-create-sqs-queue-for-notification
+
+	•	Lookup recently updated lead owner files in another S3 location. Merge lead and lead owner data using lead_id and store data into the S3 bucket target folders
+Use the following public S3 bucket to perform a lookup and assign lead owner details to each newly created lead that was stored in S3 from the CRM webhook event.
+Public S3 Bucket and File Details
+bucket_name : dea-lead-owner
+file_name = f"{lead_id}.json"
+public_url = f"https://{bucket_name}.s3.us-east-1.amazonaws.com/{file_name}"
+
+Sample lookup data - lead_niuYPXlw6vnFQIhwZCKDaaKv9XMQs9KA5NgxhNRBgaA.json
+
+{
+"lead_id": "lead_niuYPXlw6vnFQIhwZCKDaaKv9XMQs9KA5NgxhNRBgaA", 
+"display_name": "Lowell Bast", 
+"lead_email": "gatequdit@gmail.com", 
+"lead_owner": "Lucija Bitunjac", 
+"funnel": "DE ACADEMY Direct VSL", 
+"status_label": "Potential", 
+"date_created": "2025-05-20T12:14:56.409000+00:00"
+}
+
+
+	•	Send notification with relevant data to the team as notification either on Slack or in an email
+Make sure that the below fields are available as part of the notification sent to either as slack notification or email notification
+ New Lead Alert 
+Name:  {display_name} - Fetch from the CRM Event data
+Lead ID : {lead_id} - Fetch from the CRM Event data
+Created Date: {date_created} - Fetch from the CRM Event data
+Label: {status_label} - Fetch from the CRM Event data
+Email: {lead_email} - Fetch from the lookup data
+Lead Owner: {lead_owner} - Fetch from the lookup data
+Funnel: {funnel} - Fetch from the lookup data
+	
+	Reference : Sending messages using incoming webhooks in Slack
+https://api.slack.com/messaging/webhooks
+
+
+
+📦 Evaluation Criteria
+	•	README with clear instructions and architecture diagram.
+	•	Modular code for webhook ingestion, lookup and S3 writing.
+	•	Alerts messages in either Slack or email send correctly as per the requirement
+	•	Effective error handling, retries, logging 
+
+✅ Success Criteria
+	•	Leads are correctly ingested and saved in S3 within seconds. 
+	•	Lead owner assignment is done only after the delay (not before). 
+	•	Lookup and enrichment match correctly by lead_id. 
+	•	The team receives real-time notifications with accurate data. 
+	•	The system handles multiple leads in parallel without race conditions.
+

@@ -167,7 +167,9 @@ SQS delivers a message twice. Each step is safe to repeat:
 3. Claim lost → read the marker:
    - `sent` → skip (duplicate), log INFO.
    - `sending` and newer than 2 minutes → another copy is mid-send: raise, retry later.
-   - `sending` and older than 2 minutes → that copy crashed mid-send: take over and send.
+   - `sending` and older than 2 minutes → that copy crashed mid-send: take over and send. The take-over
+     is also a conditional write (`IfMatch=<ETag read>`), so if two copies find the same stale marker,
+     only one takes over.
      (A crash *after* Slack accepted but before the marker update can cause one duplicate alert:
      accepted, because the alternative is a lost alert.)
 

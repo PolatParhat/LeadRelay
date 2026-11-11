@@ -5,6 +5,7 @@
 | Date | Decision | Reason |
 |---|---|---|
 | 2026-11-10 | Build in 7 steps (architecture → local code+tests → IaC → deploy+curl test → real Close webhook → hardening → README/demo/teardown) | Local tests first so most work needs no AWS; real webhook only once the system works |
+| 2026-11-11 | Alerts go to Slack via an incoming webhook (not email) | Simplest setup, the option the requirements link to, best for the demo; webhook URL kept in AWS Secrets Manager / `.env`, never in git |
 
 ## Change log
 

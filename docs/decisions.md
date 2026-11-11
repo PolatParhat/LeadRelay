@@ -8,6 +8,7 @@
 | 2026-11-11 | Alerts go to Slack via an incoming webhook (not email) | Simplest setup, the option the requirements link to, best for the demo; webhook URL kept in AWS Secrets Manager / `.env`, never in git |
 | 2026-11-11 | Infrastructure as code with Terraform (not CDK) | User's choice: learn Terraform on this project; Terraform v1.15.8 already installed |
 | 2026-11-11 | Names: bucket `leadrelay-{account_id}`; raw `source/crm_event_{lead_id}.json`; enriched `target/enriched_{lead_id}.json`; alert markers `alerts_sent/{lead_id}` | Account ID makes the bucket name globally unique; enriched name mirrors the raw one |
+| 2026-11-11 | Missing owner after the delay: retry, then alert as UNASSIGNED (option C). Retry by letting the SQS message return (visibility timeout ~5 min, read `ApproximateReceiveCount`); after ~6 tries alert with `Lead Owner: UNASSIGNED` and log a WARNING. Real errors (Slack down, bad data) still go to the DLQ. Gap and try count are settings | Usually gets the owner, never drops a lead; tune numbers once Azmat/Ninad say how fast owners appear |
 
 ## Change log
 

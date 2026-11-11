@@ -12,7 +12,7 @@ Step 1 (architecture + decisions) is next. The requirements were walked through 
 - User agreed the 7 steps; written into CLAUDE.md and docs/decisions.md.
 
 ## Next actions
-1. Step 1 (Slack, Terraform, names chosen 2026-11-11): user decides missing-owner policy (retry, alert as UNASSIGNED, or retry-then-alert); GitHub repo?
+1. Step 1 (Slack, Terraform, names, missing-owner = retry-then-alert chosen 2026-11-11): user decides GitHub repo?
 2. Send Azmat/Ninad the open questions below.
 3. Write the architecture (diagram + components) into docs once decisions are made.
 
@@ -21,7 +21,7 @@ Step 1 (architecture + decisions) is next. The requirements were walked through 
 - Questions for Azmat/Ninad: does `dea-lead-owner` still hold files, and how soon after lead creation;
   behaviour when the owner file is missing after 10 min; Close signing key for `Close-Sig-Hash`
   verification; are duplicate alerts acceptable.
-- User decisions pending: missing-owner policy, GitHub repo.
+- User decisions pending: GitHub repo.
 
 ## Environment gotchas
 - `dea-lead-owner` returns 403 for missing files (no ListBucket permission), not 404.

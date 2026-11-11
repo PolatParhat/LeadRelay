@@ -33,7 +33,8 @@ State: STATUS.md · History: docs/decisions.md (read it before re-deciding anyth
 
 ## Key facts (a fresh session must not get these wrong)
 
-- Raw file name: `crm_event_{lead_id}.json` in the bucket's source folder; enriched output goes to target folders.
+- Bucket `leadrelay-{account_id}`. Raw: `source/crm_event_{lead_id}.json`. Enriched: `target/enriched_{lead_id}.json`.
+  Alert-sent markers: `alerts_sent/{lead_id}`. Alerts go to Slack (incoming webhook). Infrastructure: Terraform.
 - Lookup URL: `https://dea-lead-owner.s3.us-east-1.amazonaws.com/{lead_id}.json`.
 - Owner lookup must happen only **after** the 10-minute delay, never before.
 - The alert must include: Name (display_name), Lead ID, Created Date, Label (status_label) from the CRM

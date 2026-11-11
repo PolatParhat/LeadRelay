@@ -7,6 +7,7 @@
 | 2026-11-10 | Build in 7 steps (architecture → local code+tests → IaC → deploy+curl test → real Close webhook → hardening → README/demo/teardown) | Local tests first so most work needs no AWS; real webhook only once the system works |
 | 2026-11-11 | Alerts go to Slack via an incoming webhook (not email) | Simplest setup, the option the requirements link to, best for the demo; webhook URL kept in AWS Secrets Manager / `.env`, never in git |
 | 2026-11-11 | Infrastructure as code with Terraform (not CDK) | User's choice: learn Terraform on this project; Terraform v1.15.8 already installed |
+| 2026-11-11 | Names: bucket `leadrelay-{account_id}`; raw `source/crm_event_{lead_id}.json`; enriched `target/enriched_{lead_id}.json`; alert markers `alerts_sent/{lead_id}` | Account ID makes the bucket name globally unique; enriched name mirrors the raw one |
 
 ## Change log
 

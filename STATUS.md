@@ -12,16 +12,15 @@ Step 1 (architecture + decisions) is next. The requirements were walked through 
 - User agreed the 7 steps; written into CLAUDE.md and docs/decisions.md.
 
 ## Next actions
-1. Step 1 (Slack, Terraform, names, missing-owner = retry-then-alert chosen 2026-11-11): user decides GitHub repo?
+1. Step 1 (Slack, Terraform, names, missing-owner = retry-then-alert, public GitHub repo chosen 2026-11-11): all decisions made; write the architecture doc.
 2. Send Azmat/Ninad the open questions below.
 3. Write the architecture (diagram + components) into docs once decisions are made.
 
 ## Open items
-- Branch `handoff-2026-11-04` (this handoff) not merged into main; no GitHub remote yet.
+- Branch `handoff-2026-11-04` (this handoff) not merged into main; remote is github.com/PolatParhat/LeadRelay (public), `main` not pushed yet.
 - Questions for Azmat/Ninad: does `dea-lead-owner` still hold files, and how soon after lead creation;
   behaviour when the owner file is missing after 10 min; Close signing key for `Close-Sig-Hash`
   verification; are duplicate alerts acceptable.
-- User decisions pending: GitHub repo.
 
 ## Environment gotchas
 - `dea-lead-owner` returns 403 for missing files (no ListBucket permission), not 404.

@@ -13,6 +13,8 @@ started before SME approval at the user's request. Video + deck sent to the SMEs
    → alert → config → receiver → processor.
 2. When SME feedback arrives: apply changes, record approval in docs/decisions.md, user merges PR #2.
 3. Send Azmat/Ninad the open questions (deck slide 18 / architecture.md section 7).
+4. FINAL (Step 8, after teardown): local-only tutorial book in `~/Documents/DataEngineerBootcamp/Books/LeadRelay/`,
+   modelled on `Books/WistiaVideoAnalytics/` (chapters per tool, labs, walkthrough, rebuild guide).
 
 ## Open items
 - Repo: github.com/PolatParhat/LeadRelay (public, default branch `main`).

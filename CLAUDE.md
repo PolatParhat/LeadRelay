@@ -30,6 +30,7 @@ State: STATUS.md · History: docs/decisions.md (read it before re-deciding anyth
 | 5 | Real Close webhook subscription via Azmat/Ninad | To do |
 | 6 | Hardening: retries, DLQ, logging, parallel-leads test | To do |
 | 7 | README + architecture diagram, demo video, teardown | To do |
+| 8 | FINAL: local-only tutorial book (every tool from a data-engineering view, examples + runnable labs, project walkthrough, rebuild guide), same format as WistiaVideoAnalytics | To do (after teardown) |
 
 ## Key facts (a fresh session must not get these wrong)
 

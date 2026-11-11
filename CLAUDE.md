@@ -23,10 +23,18 @@ State: STATUS.md · History: docs/decisions.md (read it before re-deciding anyth
 | Step | Description | Status |
 |---|---|---|
 | 0 | Project scaffold | Done |
+| 1 | Architecture + decisions (Slack/email, IaC tool, bucket/folder/file names, missing-owner policy) | Next |
+| 2 | Local code + pytest, no AWS (receiver, lookup, enrich, alert modules) | To do |
+| 3 | Infrastructure as code (bucket, queues + DLQ, Lambdas, API Gateway, notification) | To do |
+| 4 | User deploys; end-to-end test with curl | To do |
+| 5 | Real Close webhook subscription via Azmat/Ninad | To do |
+| 6 | Hardening: retries, DLQ, logging, parallel-leads test | To do |
+| 7 | README + architecture diagram, demo video, teardown | To do |
 
 ## Key facts (a fresh session must not get these wrong)
 
-- Raw file name: `crm_event_{lead_id}.json` in the bucket's source folder; enriched output goes to target folders.
+- Bucket `leadrelay-{account_id}`. Raw: `source/crm_event_{lead_id}.json`. Enriched: `target/enriched_{lead_id}.json`.
+  Alert-sent markers: `alerts_sent/{lead_id}`. Alerts go to Slack (incoming webhook). Infrastructure: Terraform.
 - Lookup URL: `https://dea-lead-owner.s3.us-east-1.amazonaws.com/{lead_id}.json`.
 - Owner lookup must happen only **after** the 10-minute delay, never before.
 - The alert must include: Name (display_name), Lead ID, Created Date, Label (status_label) from the CRM

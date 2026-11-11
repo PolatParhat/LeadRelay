@@ -23,6 +23,13 @@ State: STATUS.md · History: docs/decisions.md (read it before re-deciding anyth
 | Step | Description | Status |
 |---|---|---|
 | 0 | Project scaffold | Done |
+| 1 | Architecture + decisions (Slack/email, IaC tool, bucket/folder/file names, missing-owner policy) | Next |
+| 2 | Local code + pytest, no AWS (receiver, lookup, enrich, alert modules) | To do |
+| 3 | Infrastructure as code (bucket, queues + DLQ, Lambdas, API Gateway, notification) | To do |
+| 4 | User deploys; end-to-end test with curl | To do |
+| 5 | Real Close webhook subscription via Azmat/Ninad | To do |
+| 6 | Hardening: retries, DLQ, logging, parallel-leads test | To do |
+| 7 | README + architecture diagram, demo video, teardown | To do |
 
 ## Key facts (a fresh session must not get these wrong)
 

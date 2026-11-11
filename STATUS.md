@@ -1,27 +1,22 @@
 # Status: LeadRelay
-Updated: 2026-11-04 by /handoff
+Updated: 2026-11-10
 
 ## Where we are
-Step 0 done: project scaffold committed (b029f7c). The requirements doc has been explained to the user
-(beginner walkthrough + abbreviation glossary). Project steps are proposed but NOT yet agreed;
-the CLAUDE.md plan table still has only Step 0.
+Step 0 done. The 7-step plan is AGREED and recorded in the CLAUDE.md plan table.
+Step 1 (architecture + decisions) is next. The requirements were walked through in detail in
+6 parts (webhook, raw S3, delay queue, lookup, enrichment, alert).
 
 ## Done this session
-- Scaffold: CLAUDE.md, STATUS.md, README.md, docs/decisions.md, .gitignore, git init (b029f7c).
-- Requirements .docx moved to `docs/00_requirements/`; plain-text copy `requirements.txt` added.
-- Explained the requirements doc in chat (not saved to a file).
-- Tested the lookup bucket with curl: both sample lead_ids from the doc, a fake id, and a bucket
-  listing all return HTTP 403 Access Denied (missing file and no permission look the same).
+- 6-part requirements walkthrough with local scratch demos (not in the repo).
+- Re-checked `dea-lead-owner`: sample lead still returns HTTP 403.
+- User agreed the 7 steps; written into CLAUDE.md and docs/decisions.md.
 
 ## Next actions
-1. User answers the 3 check questions from the explanation (why the delay / SQS delay queue;
-   which alert fields come from the lookup; why parallel leads don't collide).
-2. User agrees on the proposed steps, then write them into the CLAUDE.md plan table and here:
-   1 architecture + decisions · 2 local code + pytest (no AWS) · 3 infrastructure as code ·
-   4 user deploys + curl end-to-end test · 5 real Close webhook via Azmat/Ninad ·
-   6 hardening (retries, DLQ, logging, parallel test) · 7 README + diagram, demo video, teardown.
-3. User decides: Slack or email; infrastructure tool (reuse globalpartners CDK `infra/` pattern?);
-   create a GitHub repo (`gh repo create`)?
+1. Step 1: user decides Slack vs email; IaC tool (reuse globalpartners CDK `infra/` pattern?);
+   bucket name, folder names, enriched file name (placeholder `target/enriched_{lead_id}.json`);
+   missing-owner policy (retry, alert as UNASSIGNED, or retry-then-alert); GitHub repo?
+2. Send Azmat/Ninad the open questions below.
+3. Write the architecture (diagram + components) into docs once decisions are made.
 
 ## Open items
 - Branch `handoff-2026-11-04` (this handoff) not merged into main; no GitHub remote yet.

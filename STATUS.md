@@ -1,26 +1,26 @@
 # Status: LeadRelay
-Updated: 2026-11-10
+Updated: 2026-11-11
 
 ## Where we are
-Step 0 done. The 7-step plan is AGREED and recorded in the CLAUDE.md plan table.
-Step 1 (architecture + decisions) is next. The requirements were walked through in detail in
-6 parts (webhook, raw S3, delay queue, lookup, enrichment, alert).
+Step 1 done: all decisions made and `docs/architecture.md` written (PR from `step1-architecture`).
+Step 2 (local code + pytest, no AWS) is next.
 
 ## Done this session
-- 6-part requirements walkthrough with local scratch demos (not in the repo).
-- Re-checked `dea-lead-owner`: sample lead still returns HTTP 403.
-- User agreed the 7 steps; written into CLAUDE.md and docs/decisions.md.
+- 6-part requirements walkthrough; 7-step plan agreed.
+- Decisions: Slack, Terraform, names, missing-owner = retry then UNASSIGNED, public GitHub repo.
+- GitHub repo created (public), PR #1 merged, default branch `main`.
+- Architecture doc written; Close signature scheme and S3 conditional write verified.
 
 ## Next actions
-1. Step 1 (Slack, Terraform, names, missing-owner = retry-then-alert, public GitHub repo chosen 2026-11-11): all decisions made; write the architecture doc.
-2. Send Azmat/Ninad the open questions below.
-3. Write the architecture (diagram + components) into docs once decisions are made.
+1. User reviews and merges the Step 1 architecture PR.
+2. Step 2: build `src/leadrelay/` modules with pytest (moto for S3, local HTTP for lookup/Slack), one module at a time.
+3. Send Azmat/Ninad the open questions (architecture.md section 7).
 
 ## Open items
-- Branch `handoff-2026-11-04` (this handoff) not merged into main; remote is github.com/PolatParhat/LeadRelay (public), `main` not pushed yet.
+- Repo: github.com/PolatParhat/LeadRelay (public, default branch `main`).
 - Questions for Azmat/Ninad: does `dea-lead-owner` still hold files, and how soon after lead creation;
   behaviour when the owner file is missing after 10 min; Close signing key for `Close-Sig-Hash`
-  verification; are duplicate alerts acceptable.
+  verification; are duplicate alerts acceptable; which Slack channel.
 
 ## Environment gotchas
 - `dea-lead-owner` returns 403 for missing files (no ListBucket permission), not 404.

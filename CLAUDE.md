@@ -23,8 +23,8 @@ State: STATUS.md · History: docs/decisions.md (read it before re-deciding anyth
 | Step | Description | Status |
 |---|---|---|
 | 0 | Project scaffold | Done |
-| 1 | Architecture + decisions (Slack/email, IaC tool, bucket/folder/file names, missing-owner policy) | Next |
-| 2 | Local code + pytest, no AWS (receiver, lookup, enrich, alert modules) | To do |
+| 1 | Architecture + decisions (Slack/email, IaC tool, bucket/folder/file names, missing-owner policy) | Done: docs/architecture.md |
+| 2 | Local code + pytest, no AWS (receiver, lookup, enrich, alert modules) | Next |
 | 3 | Infrastructure as code (bucket, queues + DLQ, Lambdas, API Gateway, notification) | To do |
 | 4 | User deploys; end-to-end test with curl | To do |
 | 5 | Real Close webhook subscription via Azmat/Ninad | To do |
@@ -48,6 +48,7 @@ State: STATUS.md · History: docs/decisions.md (read it before re-deciding anyth
 LeadRelay/
 ├── CLAUDE.md · STATUS.md · README.md    rules · current state · index
 ├── docs/00_requirements/                requirements doc (+ text copy)
+├── docs/architecture.md                 flow diagram, components, settings, idempotency
 └── docs/decisions.md                    decisions and change log
 ```
 

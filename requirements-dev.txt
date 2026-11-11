@@ -1,0 +1,5 @@
+# Local development and tests only. The Lambda code itself needs nothing beyond
+# the Python standard library and boto3 (already included in the Lambda runtime).
+boto3==1.44.0
+moto[s3]==5.2.5
+pytest==9.2.0

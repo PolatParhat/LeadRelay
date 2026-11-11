@@ -2,22 +2,17 @@
 Updated: 2026-11-11
 
 ## Where we are
-Step 1 deliverables ready, AWAITING SME APPROVAL. Do not start Step 2 until the user says the SMEs approved.
-- `docs/architecture.md` (PR #2, branch `step1-architecture`).
-- Design deck for the video and SME review: https://claude.ai/artifact/JTCcBTgzPNRngHbBw2rUH1
-  (17 slides, speaker notes = video script; private to the user until they share it).
-
-## Done this session
-- 6-part requirements walkthrough; 7-step plan agreed.
-- Decisions: Slack, Terraform, names, missing-owner = retry then UNASSIGNED, public GitHub repo.
-- GitHub repo created (public), PR #1 merged, default branch `main`.
-- Architecture doc written; Close signature scheme and S3 conditional write verified.
+Step 2 (local code + pytest, no AWS) IN PROGRESS on branch `step2-local-code` (worktree `../LeadRelay-step2`),
+started before SME approval at the user's request. Video + deck sent to the SMEs; approval pending.
+- `docs/architecture.md` on PR #2 (branch `step1-architecture`): do NOT merge until the SMEs approve.
+- Design deck: https://claude.ai/artifact/JTCcBTgzPNRngHbBw2rUH1 (18 slides).
+- Done in Step 2: dev setup (pyproject.toml, requirements-dev.txt, `.venv`, smoke test passes).
 
 ## Next actions
-1. User reviews the deck and PR #2, records the video walkthrough, sends both to the SMEs.
-2. Apply any SME feedback to the deck and docs/architecture.md; record the approval in docs/decisions.md.
-3. After approval: merge PR #2, then Step 2 (local code + pytest).
-4. Send Azmat/Ninad the open questions (deck slide 17 / architecture.md section 7).
+1. Step 2 modules in build order, one per message with tests: signature → storage → lookup → enrich
+   → alert → config → receiver → processor.
+2. When SME feedback arrives: apply changes, record approval in docs/decisions.md, user merges PR #2.
+3. Send Azmat/Ninad the open questions (deck slide 18 / architecture.md section 7).
 
 ## Open items
 - Repo: github.com/PolatParhat/LeadRelay (public, default branch `main`).

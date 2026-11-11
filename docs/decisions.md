@@ -11,6 +11,7 @@
 | 2026-11-11 | Missing owner after the delay: retry, then alert as UNASSIGNED (option C). Retry by letting the SQS message return (visibility timeout ~5 min, read `ApproximateReceiveCount`); after ~6 tries alert with `Lead Owner: UNASSIGNED` and log a WARNING. Real errors (Slack down, bad data) still go to the DLQ. Gap and try count are settings | Usually gets the owner, never drops a lead; tune numbers once Azmat/Ninad say how fast owners appear |
 | 2026-11-11 | GitHub repo `PolatParhat/LeadRelay` is public | User's choice (portfolio); requirements doc with sample names/emails is visible, accepted by user |
 | 2026-11-11 | Architecture (docs/architecture.md): API Gateway HTTP API (payload 1.0); secrets in SSM Parameter Store SecureString; SQS delay 600 s, visibility 300 s, DLQ after 10 tries; processor batch size 1, timeout 30 s; `OWNER_MAX_TRIES = 6`; alert marker claimed with S3 conditional write (`IfNoneMatch="*"`); runtime code uses standard library + boto3 only | HTTP API cheaper/simpler; Parameter Store free; batch size 1 keeps one lead's failure from retrying others; maxReceiveCount > 6 keeps "owner missing" out of the DLQ; conditional write makes the alert claim atomic; no dependencies means a plain zip |
+| 2026-11-11 | Start Step 2 (local code + tests, no AWS) before SME approval arrives; PR #2 stays unmerged until approval | User expects approval; local code is cheap to change if the SMEs ask for changes. Nothing is deployed before approval |
 
 ## Change log
 
@@ -33,3 +34,5 @@
     (second `IfNoneMatch="*"` put fails with PreconditionFailed).
   - Gate added: Step 2 starts only after the user's SMEs approve the architecture and implementation plan.
     Design deck (17 slides with speaker notes as the video script) published for the review.
+  - Design deck now 18 slides (added "Why we named it LeadRelay"); video recorded and sent to the SMEs.
+  - Step 2 started at user's request before approval (branch `step2-local-code`).

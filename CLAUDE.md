@@ -24,7 +24,7 @@ State: STATUS.md · History: docs/decisions.md (read it before re-deciding anyth
 |---|---|---|
 | 0 | Project scaffold | Done |
 | 1 | Architecture + decisions (Slack/email, IaC tool, bucket/folder/file names, missing-owner policy) | Awaiting SME approval (docs/architecture.md + design deck + video) |
-| 2 | Local code + pytest, no AWS (receiver, lookup, enrich, alert modules) | Blocked: starts only after SME approval |
+| 2 | Local code + pytest, no AWS (receiver, lookup, enrich, alert modules) | In progress (started before SME approval, user's call) |
 | 3 | Infrastructure as code (bucket, queues + DLQ, Lambdas, API Gateway, notification) | To do |
 | 4 | User deploys; end-to-end test with curl | To do |
 | 5 | Real Close webhook subscription via Azmat/Ninad | To do |
@@ -50,11 +50,14 @@ LeadRelay/
 ├── docs/00_requirements/                requirements doc (+ text copy)
 ├── docs/architecture.md                 flow diagram, components, settings, idempotency
 └── docs/decisions.md                    decisions and change log
+src/leadrelay/                           Python package (Lambda code)
+tests/                                   pytest tests (no AWS)
+pyproject.toml · requirements-dev.txt    pytest settings · dev dependencies
 ```
 
 ## Conventions
 
 - Secrets (Slack webhook URL, Close signing key, AWS keys) live in `.env` or AWS, never in git.
 - Code changes go on a branch (worktree) and reach `main` through a PR the user reviews.
-- Gate: no implementation (Step 2+) until the user's SMEs approve the architecture design and
-  implementation plan. The user records a video walkthrough of the design deck for that review.
+- Gate: nothing is deployed to AWS (Step 3+ apply) and PR #2 is not merged until the user's SMEs
+  approve the architecture. Step 2 local code started early at the user's request.

@@ -1,11 +1,10 @@
 """Tests for leadrelay.lookup against a small fake web server on this Mac (no internet)."""
 
-import http.server
 import json
-import threading
 
 import pytest
 
+from fake_http import FakeHttpServer
 from leadrelay.lookup import OwnerLookupError, fetch_owner
 
 OWNER_FILE = {
@@ -19,37 +18,9 @@ OWNER_FILE = {
 }
 
 
-class FakeOwnerBucket:
-    """A tiny web server. `replies` is a list of (status, body) it gives in order."""
-
-    def __init__(self):
-        self.replies = []
-        self.requests = []
-        fake = self
-
-        class Handler(http.server.BaseHTTPRequestHandler):
-            def do_GET(self):
-                fake.requests.append(self.path)
-                status, body = fake.replies.pop(0) if fake.replies else (403, b"")
-                self.send_response(status)
-                self.end_headers()
-                self.wfile.write(body)
-
-            def log_message(self, *args):  # keep test output quiet
-                pass
-
-        self.server = http.server.HTTPServer(("127.0.0.1", 0), Handler)  # port 0 = any free port
-        self.url = f"http://127.0.0.1:{self.server.server_port}"
-        threading.Thread(target=self.server.serve_forever, kwargs={"poll_interval": 0.01}, daemon=True).start()
-
-    def close(self):
-        self.server.shutdown()
-        self.server.server_close()
-
-
 @pytest.fixture
 def bucket():
-    fake = FakeOwnerBucket()
+    fake = FakeHttpServer()
     yield fake
     fake.close()
 
@@ -71,7 +42,7 @@ def test_found_returns_the_three_owner_fields(bucket, waits):
         "lead_owner": "Lucija Bitunjac",
         "funnel": "DE ACADEMY Direct VSL",
     }
-    assert bucket.requests == ["/lead_1.json"]
+    assert [r["path"] for r in bucket.requests] == ["/lead_1.json"]
 
 
 @pytest.mark.parametrize("status", [403, 404])

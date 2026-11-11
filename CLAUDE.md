@@ -59,6 +59,6 @@ pyproject.toml · requirements-dev.txt    pytest settings · dev dependencies
 ## Conventions
 
 - Secrets (Slack webhook URL, Close signing key, AWS keys) live in `.env` or AWS, never in git.
-- Code changes go on a branch (worktree) and reach `main` through a PR the user reviews.
+- Code changes go on a branch in this same folder (no separate worktree folders) and reach `main` through a PR the user reviews.
 - Gate: nothing is deployed to AWS (Step 3+ apply) and PR #2 is not merged until the user's SMEs
   approve the architecture. Step 2 local code started early at the user's request.

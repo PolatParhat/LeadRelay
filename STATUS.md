@@ -2,7 +2,7 @@
 Updated: 2026-11-11
 
 ## Where we are
-Step 2 (local code + pytest, no AWS) IN PROGRESS on branch `step2-local-code` (worktree `../LeadRelay-step2`),
+Step 2 (local code + pytest, no AWS) IN PROGRESS on branch `step2-local-code` (in this folder),
 started before SME approval at the user's request. Video + deck sent to the SMEs; approval pending.
 - `docs/architecture.md` on PR #2 (branch `step1-architecture`): do NOT merge until the SMEs approve.
 - Design deck: https://claude.ai/artifact/JTCcBTgzPNRngHbBw2rUH1 (18 slides).

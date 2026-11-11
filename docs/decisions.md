@@ -31,3 +31,5 @@
   - `docs/architecture.md` written. Verified: Close signature scheme against Close docs (HMAC-SHA256 of
     timestamp + body, hex key; 2xx within 15 s; retries up to 72 h) and S3 conditional write with moto
     (second `IfNoneMatch="*"` put fails with PreconditionFailed).
+  - Gate added: Step 2 starts only after the user's SMEs approve the architecture and implementation plan.
+    Design deck (17 slides with speaker notes as the video script) published for the review.

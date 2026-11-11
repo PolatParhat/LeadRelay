@@ -2,8 +2,10 @@
 Updated: 2026-11-11
 
 ## Where we are
-Step 1 done: all decisions made and `docs/architecture.md` written (PR from `step1-architecture`).
-Step 2 (local code + pytest, no AWS) is next.
+Step 1 deliverables ready, AWAITING SME APPROVAL. Do not start Step 2 until the user says the SMEs approved.
+- `docs/architecture.md` (PR #2, branch `step1-architecture`).
+- Design deck for the video and SME review: https://claude.ai/artifact/JTCcBTgzPNRngHbBw2rUH1
+  (17 slides, speaker notes = video script; private to the user until they share it).
 
 ## Done this session
 - 6-part requirements walkthrough; 7-step plan agreed.
@@ -12,9 +14,10 @@ Step 2 (local code + pytest, no AWS) is next.
 - Architecture doc written; Close signature scheme and S3 conditional write verified.
 
 ## Next actions
-1. User reviews and merges the Step 1 architecture PR.
-2. Step 2: build `src/leadrelay/` modules with pytest (moto for S3, local HTTP for lookup/Slack), one module at a time.
-3. Send Azmat/Ninad the open questions (architecture.md section 7).
+1. User reviews the deck and PR #2, records the video walkthrough, sends both to the SMEs.
+2. Apply any SME feedback to the deck and docs/architecture.md; record the approval in docs/decisions.md.
+3. After approval: merge PR #2, then Step 2 (local code + pytest).
+4. Send Azmat/Ninad the open questions (deck slide 17 / architecture.md section 7).
 
 ## Open items
 - Repo: github.com/PolatParhat/LeadRelay (public, default branch `main`).

@@ -23,8 +23,8 @@ State: STATUS.md · History: docs/decisions.md (read it before re-deciding anyth
 | Step | Description | Status |
 |---|---|---|
 | 0 | Project scaffold | Done |
-| 1 | Architecture + decisions (Slack/email, IaC tool, bucket/folder/file names, missing-owner policy) | Done: docs/architecture.md |
-| 2 | Local code + pytest, no AWS (receiver, lookup, enrich, alert modules) | Next |
+| 1 | Architecture + decisions (Slack/email, IaC tool, bucket/folder/file names, missing-owner policy) | Awaiting SME approval (docs/architecture.md + design deck + video) |
+| 2 | Local code + pytest, no AWS (receiver, lookup, enrich, alert modules) | Blocked: starts only after SME approval |
 | 3 | Infrastructure as code (bucket, queues + DLQ, Lambdas, API Gateway, notification) | To do |
 | 4 | User deploys; end-to-end test with curl | To do |
 | 5 | Real Close webhook subscription via Azmat/Ninad | To do |
@@ -56,3 +56,5 @@ LeadRelay/
 
 - Secrets (Slack webhook URL, Close signing key, AWS keys) live in `.env` or AWS, never in git.
 - Code changes go on a branch (worktree) and reach `main` through a PR the user reviews.
+- Gate: no implementation (Step 2+) until the user's SMEs approve the architecture design and
+  implementation plan. The user records a video walkthrough of the design deck for that review.

@@ -180,6 +180,9 @@ in parallel. Slack's webhook limit (about 1 message per second) is handled by th
 ## 5. Logging and monitoring
 - JSON log lines to CloudWatch Logs, every line carries `lead_id` and the step
   (`receive`, `lookup`, `enrich`, `alert`). Log retention 14 days.
+- How: the Lambdas use Lambda's built-in JSON log format (`log_format = "JSON"` in Terraform). Python's
+  standard `logging` then writes JSON, and fields passed as `extra={"lead_id": ...}` become JSON keys.
+  No logging library needed.
 - Levels: INFO normal flow, WARNING unassigned owner / bad signature, ERROR failures.
 - Step 6 (hardening) adds a CloudWatch alarm when the DLQ holds any message.
 

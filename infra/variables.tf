@@ -17,3 +17,22 @@ variable "log_retention_days" {
   type        = number
   default     = 14
 }
+
+
+variable "delay_seconds" {
+  description = "How long each new lead waits before the owner lookup (requirement: 10 minutes)."
+  type        = number
+  default     = 600
+}
+
+variable "retry_after_seconds" {
+  description = "SQS visibility timeout: a failed message comes back after this long."
+  type        = number
+  default     = 300
+}
+
+variable "max_receive_count" {
+  description = "Deliveries before a message moves to the dead-letter queue (must be above owner_max_tries)."
+  type        = number
+  default     = 10
+}

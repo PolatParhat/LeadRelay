@@ -8,12 +8,14 @@ started before SME approval at the user's request. Video + deck sent to the SMEs
 - Design deck: https://claude.ai/artifact/JTCcBTgzPNRngHbBw2rUH1 (18 slides).
 - Done in Step 2: dev setup + all 8 modules (signature, storage, lookup, enrich, alert, config, receiver,
   processor) with tests: 104 passed. Receiver verified on the requirements' sample webhook.
+  `scripts/demo_local.py` runs leads end to end locally (found owner, duplicate, UNASSIGNED, forged).
 
 ## Next actions
-1. Finish Step 2: local end-to-end demo run, then open the Step 2 PR for review.
-2. When SME feedback arrives: apply changes, record approval in docs/decisions.md, user merges PR #2.
-3. Send Azmat/Ninad the open questions (deck slide 18 / architecture.md section 7).
-4. FINAL (Step 8, after teardown): local-only tutorial book in `~/Documents/DataEngineerBootcamp/Books/LeadRelay/`,
+1. User reviews the Step 2 PR (based on PR #2's branch; merge after PR #2).
+2. Then Step 3: Terraform (infra/).
+3. When SME feedback arrives: apply changes, record approval in docs/decisions.md, user merges PR #2.
+4. Send Azmat/Ninad the open questions (deck slide 18 / architecture.md section 7).
+5. FINAL (Step 8, after teardown): local-only tutorial book in `~/Documents/DataEngineerBootcamp/Books/LeadRelay/`,
    modelled on `Books/WistiaVideoAnalytics/` (chapters per tool, labs, walkthrough, rebuild guide).
 
 ## Open items

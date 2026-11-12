@@ -9,3 +9,9 @@ lake/
 *.mp4
 infra/cdk.out/
 infra/build/
+# Terraform: downloaded providers, state (contains resource details), plan files
+infra/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+infra/build/

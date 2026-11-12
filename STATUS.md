@@ -6,11 +6,11 @@ Step 2 (local code + pytest, no AWS) IN PROGRESS on branch `step2-local-code` (i
 started before SME approval at the user's request. Video + deck sent to the SMEs; approval pending.
 - `docs/architecture.md` on PR #2 (branch `step1-architecture`): do NOT merge until the SMEs approve.
 - Design deck: https://claude.ai/artifact/JTCcBTgzPNRngHbBw2rUH1 (18 slides).
-- Done in Step 2: dev setup (pyproject.toml, requirements-dev.txt, `.venv`, smoke test passes).
+- Done in Step 2: dev setup + all 8 modules (signature, storage, lookup, enrich, alert, config, receiver,
+  processor) with tests: 104 passed. Receiver verified on the requirements' sample webhook.
 
 ## Next actions
-1. Step 2 modules in build order, one per message with tests: signature → storage → lookup → enrich
-   → alert → config → receiver → processor.
+1. Finish Step 2: local end-to-end demo run, then open the Step 2 PR for review.
 2. When SME feedback arrives: apply changes, record approval in docs/decisions.md, user merges PR #2.
 3. Send Azmat/Ninad the open questions (deck slide 18 / architecture.md section 7).
 4. FINAL (Step 8, after teardown): local-only tutorial book in `~/Documents/DataEngineerBootcamp/Books/LeadRelay/`,

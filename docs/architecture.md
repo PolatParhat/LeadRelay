@@ -84,6 +84,10 @@ lead's failure never retries another's). Timeout 30 s (visibility timeout 300 s 
 4. Build the enriched record and write `target/enriched_{lead_id}.json`.
 5. Send the alert exactly once (see section 4).
 
+A failed message is reported back with `batchItemFailures` (Terraform: `function_response_types =
+["ReportBatchItemFailures"]`), so only that message returns. "Owner not there yet" and "another copy is
+sending" are logged at INFO, not as errors.
+
 ### 2.5 Missing owner policy (decided: retry, then alert as UNASSIGNED)
 Uses the message's `ApproximateReceiveCount` (how many times SQS has delivered it):
 

@@ -9,10 +9,12 @@ started before SME approval at the user's request. Video + deck sent to the SMEs
 - Done in Step 2: dev setup + all 8 modules (signature, storage, lookup, enrich, alert, config, receiver,
   processor) with tests: 104 passed. Receiver verified on the requirements' sample webhook.
   `scripts/demo_local.py` runs leads end to end locally (found owner, duplicate, UNASSIGNED, forged).
+- Step 3 written on branch `step3-terraform` (infra/, 27 resources, validate + plan clean, nothing applied).
 
 ## Next actions
-1. User reviews the Step 2 PR (based on PR #2's branch; merge after PR #2).
-2. Then Step 3: Terraform (infra/).
+1. User reviews PR #3 (Step 2) and PR #4 (Step 3); merge order #2 → #3 → #4.
+2. Step 4: user runs `terraform apply` (27 resources), sets the Slack secret, curl tests. Gate in CLAUDE.md:
+   no apply before SME approval unless the user decides otherwise.
 3. When SME feedback arrives: apply changes, record approval in docs/decisions.md, user merges PR #2.
 4. Send Azmat/Ninad the open questions (deck slide 18 / architecture.md section 7).
 5. FINAL (Step 8, after teardown): local-only tutorial book in `~/Documents/DataEngineerBootcamp/Books/LeadRelay/`,

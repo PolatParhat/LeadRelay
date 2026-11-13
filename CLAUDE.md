@@ -24,9 +24,9 @@ State: STATUS.md · History: docs/decisions.md (read it before re-deciding anyth
 |---|---|---|
 | 0 | Project scaffold | Done |
 | 1 | Architecture + decisions (Slack/email, IaC tool, bucket/folder/file names, missing-owner policy) | Awaiting SME approval (docs/architecture.md + design deck + video) |
-| 2 | Local code + pytest, no AWS (receiver, lookup, enrich, alert modules) | In progress (started before SME approval, user's call) |
-| 3 | Infrastructure as code (bucket, queues + DLQ, Lambdas, API Gateway, notification) | To do |
-| 4 | User deploys; end-to-end test with curl | To do |
+| 2 | Local code + pytest, no AWS (receiver, lookup, enrich, alert modules) | Done (PR #3) |
+| 3 | Infrastructure as code (bucket, queues + DLQ, Lambdas, API Gateway, notification) | Done (PR #4, not applied) |
+| 4 | User deploys; end-to-end test with curl | In progress |
 | 5 | Real Close webhook subscription via Azmat/Ninad | To do |
 | 6 | Hardening: retries, DLQ, logging, parallel-leads test | To do |
 | 7 | README + architecture diagram, demo video, teardown | To do |
@@ -60,5 +60,6 @@ pyproject.toml · requirements-dev.txt    pytest settings · dev dependencies
 
 - Secrets (Slack webhook URL, Close signing key, AWS keys) live in `.env` or AWS, never in git.
 - Code changes go on a branch in this same folder (no separate worktree folders) and reach `main` through a PR the user reviews.
-- Gate: nothing is deployed to AWS (Step 3+ apply) and PR #2 is not merged until the user's SMEs
-  approve the architecture. Step 2 local code started early at the user's request.
+- Gate: PR #2 is not merged until the user's SMEs approve the architecture. Steps 2-4 (code,
+  Terraform, first deploy) went ahead before approval at the user's request; SME changes are applied
+  in place afterwards.

@@ -210,8 +210,10 @@ Standard library only at runtime (`urllib`, `json`, `hmac`) plus `boto3`, which 
 runtime already includes, so the deployment package is a plain zip with no dependencies.
 
 ## 7. Open questions (for Azmat/Ninad)
-1. Does `dea-lead-owner` still hold files? Sample lead_ids return HTTP 403 (checked 2026-11-04
-   and 2026-11-10). How soon after lead creation does an owner file appear? (Tunes `OWNER_MAX_TRIES`.)
-2. The Close `signature_key` for our subscription (returned when they create it).
-3. Are occasional duplicate alerts acceptable (see section 4)?
-4. Which Slack channel should receive alerts?
+Answered by the SME on 2026-11-12 (architecture approved):
+1. `dea-lead-owner` is public, but each owner file is kept for **one day** only, so old sample
+   lead_ids return 403. Test with recent leads through the public HTTPS URL (as built). A 403 for a
+   fresh lead still means "not written yet", handled by the missing-owner policy (section 2.5).
+2. The Close `signature_key` will be shared by the SME. Until then a self-generated test key is used.
+3. Still open: are occasional duplicate alerts acceptable (see section 4)?
+4. Slack: use our own channel in a workspace we control for testing (done: incoming webhook in SSM).

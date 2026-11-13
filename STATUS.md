@@ -2,29 +2,25 @@
 Updated: 2026-11-12
 
 ## Where we are
-Step 2 (local code + pytest, no AWS) IN PROGRESS on branch `step2-local-code` (in this folder),
-started before SME approval at the user's request. Video + deck sent to the SMEs; approval pending.
-- `docs/architecture.md` on PR #2 (branch `step1-architecture`): do NOT merge until the SMEs approve.
-- Design deck: https://claude.ai/artifact/JTCcBTgzPNRngHbBw2rUH1 (18 slides).
-- Done in Step 2: dev setup + all 8 modules (signature, storage, lookup, enrich, alert, config, receiver,
-  processor) with tests: 104 passed. Receiver verified on the requirements' sample webhook.
-  `scripts/demo_local.py` runs leads end to end locally (found owner, duplicate, UNASSIGNED, forged).
-- Step 3 written on branch `step3-terraform` (infra/, 27 resources, validate + plan clean, nothing applied).
+**SME approved the architecture (2026-11-12).** Steps 0-3 done; Step 4 (deploy + test) in progress.
+- Deployed with `terraform apply` from branch `step3-terraform`: 27 resources, webhook URL
+  `https://0coi22ofrh.execute-api.us-east-1.amazonaws.com/crm`. Secrets set: test signature key
+  (also in `.env` as TEST_SIGNATURE_KEY) and Slack webhook (own test channel).
+- Verified in AWS: S3 test event → 10 min delay → processor → "S3 test event ignored".
+- PRs: #2 (Step 1 docs), #3 (Step 2 code), #4 (Step 3 Terraform + Step 4 script). Merge in that order.
 
 ## Next actions
-1. User reviews PR #3 (Step 2) and PR #4 (Step 3); merge order #2 → #3 → #4.
-2. Step 4: user runs `terraform apply` (27 resources), sets the Slack secret, curl tests. Gate in CLAUDE.md:
-   no apply before SME approval unless the user decides otherwise.
-3. When SME feedback arrives: apply changes, record approval in docs/decisions.md, user merges PR #2.
-4. Send Azmat/Ninad the open questions (deck slide 18 / architecture.md section 7).
-5. FINAL (Step 8, after teardown): local-only tutorial book in `~/Documents/DataEngineerBootcamp/Books/LeadRelay/`,
+1. User merges PR #2, then #3, then #4 (each retargets to main after the previous merge).
+2. Send a signed test lead: `.venv/bin/python scripts/send_test_lead.py` (+ `--bad-signature`, `--action updated`);
+   expect UNASSIGNED alert at ~35 min unless the lead_id has a fresh owner file.
+3. Send the webhook URL to the SME for the Close subscription; when the real signature_key arrives, store it
+   with the `set_secrets` command from `terraform output` (Step 5).
+4. FINAL (Step 8, after teardown): local-only tutorial book in `~/Documents/DataEngineerBootcamp/Books/LeadRelay/`,
    modelled on `Books/WistiaVideoAnalytics/` (chapters per tool, labs, walkthrough, rebuild guide).
 
 ## Open items
 - Repo: github.com/PolatParhat/LeadRelay (public, default branch `main`).
-- Questions for Azmat/Ninad: does `dea-lead-owner` still hold files, and how soon after lead creation;
-  behaviour when the owner file is missing after 10 min; Close signing key for `Close-Sig-Hash`
-  verification; are duplicate alerts acceptable; which Slack channel.
+- Still open with the SME: are rare duplicate alerts acceptable (architecture.md section 4).
 
 ## Environment gotchas
 - `dea-lead-owner` returns 403 for missing files (no ListBucket permission), not 404.

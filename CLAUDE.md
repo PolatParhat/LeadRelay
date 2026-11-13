@@ -23,7 +23,7 @@ State: STATUS.md · History: docs/decisions.md (read it before re-deciding anyth
 | Step | Description | Status |
 |---|---|---|
 | 0 | Project scaffold | Done |
-| 1 | Architecture + decisions (Slack/email, IaC tool, bucket/folder/file names, missing-owner policy) | Awaiting SME approval (docs/architecture.md + design deck + video) |
+| 1 | Architecture + decisions (Slack/email, IaC tool, bucket/folder/file names, missing-owner policy) | Done, SME approved 2026-11-12 |
 | 2 | Local code + pytest, no AWS (receiver, lookup, enrich, alert modules) | Done (PR #3) |
 | 3 | Infrastructure as code (bucket, queues + DLQ, Lambdas, API Gateway, notification) | Done (PR #4, not applied) |
 | 4 | User deploys; end-to-end test with curl | In progress |
@@ -60,6 +60,4 @@ pyproject.toml · requirements-dev.txt    pytest settings · dev dependencies
 
 - Secrets (Slack webhook URL, Close signing key, AWS keys) live in `.env` or AWS, never in git.
 - Code changes go on a branch in this same folder (no separate worktree folders) and reach `main` through a PR the user reviews.
-- Gate: PR #2 is not merged until the user's SMEs approve the architecture. Steps 2-4 (code,
-  Terraform, first deploy) went ahead before approval at the user's request; SME changes are applied
-  in place afterwards.
+- SME approved the architecture on 2026-11-12 (owner files live one day in `dea-lead-owner`).

@@ -15,6 +15,7 @@
 | 2026-11-11 | Add Step 8 (final): tutorial book like WistiaVideoAnalytics, at `~/Documents/DataEngineerBootcamp/Books/LeadRelay/`, kept local only (never in Git); hand-typed rebuild in `~/Documents/DataEngineerBootcamp/Practice/LeadRelay-rebuild/` | User decision: finish the project first, then learn every tool from the book and rebuild by hand |
 | 2026-11-12 | Terraform: local state (git-ignored); AWS provider ~> 6.0; Lambdas python3.13 arm64, one shared zip of src/, JSON log format; secrets created as write-only `value_wo` placeholders (`CHANGE_ME`), real values set by the user with the AWS CLI; processor role has `s3:ListBucket` so missing markers return 404 not 403; API stage throttled 20 rps / burst 50 with access logs | Single user and environment; secrets never in state or git; ListBucket needed for `read_marker()` to work on real S3 |
 | 2026-11-12 | Deploy (terraform apply) before SME approval | User's call: idle cost about zero, `terraform destroy` removes everything, SME changes can be applied in place |
+| 2026-11-12 | **SME approved the architecture.** Owner files live one day in `dea-lead-owner` (old samples 403); signature_key to be shared by the SME; Slack alerts go to our own test channel | SME review of the deck, video and docs |
 
 ## Change log
 
@@ -43,3 +44,5 @@
 - 2026-11-12:
   - Step 2 done (8 modules, 104 tests, local demo); PR #3.
   - Step 3 Terraform written (27 resources; validate and plan clean; not applied); PR #4.
+  - Deployed (27 resources). Real AWS check: the S3 test event went through notification → 10 min delay → processor, ignored as designed.
+  - SME approved the architecture; open questions 1, 2, 4 answered (architecture.md section 7).

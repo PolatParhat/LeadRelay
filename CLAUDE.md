@@ -23,13 +23,14 @@ State: STATUS.md · History: docs/decisions.md (read it before re-deciding anyth
 | Step | Description | Status |
 |---|---|---|
 | 0 | Project scaffold | Done |
-| 1 | Architecture + decisions (Slack/email, IaC tool, bucket/folder/file names, missing-owner policy) | Awaiting SME approval (docs/architecture.md + design deck + video) |
-| 2 | Local code + pytest, no AWS (receiver, lookup, enrich, alert modules) | Blocked: starts only after SME approval |
-| 3 | Infrastructure as code (bucket, queues + DLQ, Lambdas, API Gateway, notification) | To do |
-| 4 | User deploys; end-to-end test with curl | To do |
+| 1 | Architecture + decisions (Slack/email, IaC tool, bucket/folder/file names, missing-owner policy) | Done, SME approved 2026-11-12 |
+| 2 | Local code + pytest, no AWS (receiver, lookup, enrich, alert modules) | Done (PR #3) |
+| 3 | Infrastructure as code (bucket, queues + DLQ, Lambdas, API Gateway, notification) | Done (PR #4, not applied) |
+| 4 | User deploys; end-to-end test with curl | In progress |
 | 5 | Real Close webhook subscription via Azmat/Ninad | To do |
 | 6 | Hardening: retries, DLQ, logging, parallel-leads test | To do |
 | 7 | README + architecture diagram, demo video, teardown | To do |
+| 8 | FINAL: local-only tutorial book (every tool from a data-engineering view, examples + runnable labs, project walkthrough, rebuild guide), same format as WistiaVideoAnalytics | To do (after teardown) |
 
 ## Key facts (a fresh session must not get these wrong)
 
@@ -50,11 +51,13 @@ LeadRelay/
 ├── docs/00_requirements/                requirements doc (+ text copy)
 ├── docs/architecture.md                 flow diagram, components, settings, idempotency
 └── docs/decisions.md                    decisions and change log
+src/leadrelay/                           Python package (Lambda code)
+tests/                                   pytest tests (no AWS)
+pyproject.toml · requirements-dev.txt    pytest settings · dev dependencies
 ```
 
 ## Conventions
 
 - Secrets (Slack webhook URL, Close signing key, AWS keys) live in `.env` or AWS, never in git.
-- Code changes go on a branch (worktree) and reach `main` through a PR the user reviews.
-- Gate: no implementation (Step 2+) until the user's SMEs approve the architecture design and
-  implementation plan. The user records a video walkthrough of the design deck for that review.
+- Code changes go on a branch in this same folder (no separate worktree folders) and reach `main` through a PR the user reviews.
+- SME approved the architecture on 2026-11-12 (owner files live one day in `dea-lead-owner`).

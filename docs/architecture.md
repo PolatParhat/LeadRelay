@@ -84,6 +84,10 @@ lead's failure never retries another's). Timeout 30 s (visibility timeout 300 s 
 4. Build the enriched record and write `target/enriched_{lead_id}.json`.
 5. Send the alert exactly once (see section 4).
 
+A failed message is reported back with `batchItemFailures` (Terraform: `function_response_types =
+["ReportBatchItemFailures"]`), so only that message returns. "Owner not there yet" and "another copy is
+sending" are logged at INFO, not as errors.
+
 ### 2.5 Missing owner policy (decided: retry, then alert as UNASSIGNED)
 Uses the message's `ApproximateReceiveCount` (how many times SQS has delivered it):
 
@@ -167,7 +171,9 @@ SQS delivers a message twice. Each step is safe to repeat:
 3. Claim lost → read the marker:
    - `sent` → skip (duplicate), log INFO.
    - `sending` and newer than 2 minutes → another copy is mid-send: raise, retry later.
-   - `sending` and older than 2 minutes → that copy crashed mid-send: take over and send.
+   - `sending` and older than 2 minutes → that copy crashed mid-send: take over and send. The take-over
+     is also a conditional write (`IfMatch=<ETag read>`), so if two copies find the same stale marker,
+     only one takes over.
      (A crash *after* Slack accepted but before the marker update can cause one duplicate alert:
      accepted, because the alternative is a lost alert.)
 
@@ -178,6 +184,9 @@ in parallel. Slack's webhook limit (about 1 message per second) is handled by th
 ## 5. Logging and monitoring
 - JSON log lines to CloudWatch Logs, every line carries `lead_id` and the step
   (`receive`, `lookup`, `enrich`, `alert`). Log retention 14 days.
+- How: the Lambdas use Lambda's built-in JSON log format (`log_format = "JSON"` in Terraform). Python's
+  standard `logging` then writes JSON, and fields passed as `extra={"lead_id": ...}` become JSON keys.
+  No logging library needed.
 - Levels: INFO normal flow, WARNING unassigned owner / bad signature, ERROR failures.
 - Step 6 (hardening) adds a CloudWatch alarm when the DLQ holds any message.
 
@@ -201,8 +210,10 @@ Standard library only at runtime (`urllib`, `json`, `hmac`) plus `boto3`, which 
 runtime already includes, so the deployment package is a plain zip with no dependencies.
 
 ## 7. Open questions (for Azmat/Ninad)
-1. Does `dea-lead-owner` still hold files? Sample lead_ids return HTTP 403 (checked 2026-11-04
-   and 2026-11-10). How soon after lead creation does an owner file appear? (Tunes `OWNER_MAX_TRIES`.)
-2. The Close `signature_key` for our subscription (returned when they create it).
-3. Are occasional duplicate alerts acceptable (see section 4)?
-4. Which Slack channel should receive alerts?
+Answered by the SME on 2026-11-12 (architecture approved):
+1. `dea-lead-owner` is public, but each owner file is kept for **one day** only, so old sample
+   lead_ids return 403. Test with recent leads through the public HTTPS URL (as built). A 403 for a
+   fresh lead still means "not written yet", handled by the missing-owner policy (section 2.5).
+2. The Close `signature_key` will be shared by the SME. Until then a self-generated test key is used.
+3. Still open: are occasional duplicate alerts acceptable (see section 4)?
+4. Slack: use our own channel in a workspace we control for testing (done: incoming webhook in SSM).

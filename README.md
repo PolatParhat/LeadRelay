@@ -15,4 +15,28 @@ add its owner, and hand it to the sales team on Slack, without dropping any lead
 | 1 | [Architecture](docs/architecture.md) |
 | – | [Decisions and change log](docs/decisions.md) |
 
-Setup and run instructions will be added as the project is built.
+## Run it locally (no AWS needed)
+
+Requires Python 3.13.
+
+```bash
+python3 -m venv .venv
+.venv/bin/pip install -r requirements-dev.txt
+.venv/bin/python -m pytest              # all unit tests (S3/SSM faked with moto, HTTP faked locally)
+.venv/bin/python scripts/demo_local.py  # one lead end to end: receiver -> processor -> Slack message
+```
+
+## Code
+
+| Module (`src/leadrelay/`) | Job |
+|---|---|
+| `receiver.py` | Lambda: Close webhook in, verify, filter, save to `source/` |
+| `processor.py` | Lambda: delayed SQS message in, lookup, `target/`, alert once |
+| `signature.py` | Close HMAC-SHA256 signature check |
+| `storage.py` | S3 key names, JSON read/write, alert marker (conditional writes) |
+| `lookup.py` | Owner lookup over HTTPS with timeout and backoff |
+| `enrich.py` | Merge CRM event + owner into the enriched record |
+| `alert.py` | Slack message format and send with retries |
+| `config.py` | Settings from environment variables, secrets from SSM Parameter Store |
+
+Deployment instructions (Terraform) will be added in Step 3.

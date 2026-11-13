@@ -11,6 +11,11 @@
 | 2026-11-11 | Missing owner after the delay: retry, then alert as UNASSIGNED (option C). Retry by letting the SQS message return (visibility timeout ~5 min, read `ApproximateReceiveCount`); after ~6 tries alert with `Lead Owner: UNASSIGNED` and log a WARNING. Real errors (Slack down, bad data) still go to the DLQ. Gap and try count are settings | Usually gets the owner, never drops a lead; tune numbers once Azmat/Ninad say how fast owners appear |
 | 2026-11-11 | GitHub repo `PolatParhat/LeadRelay` is public | User's choice (portfolio); requirements doc with sample names/emails is visible, accepted by user |
 | 2026-11-11 | Architecture (docs/architecture.md): API Gateway HTTP API (payload 1.0); secrets in SSM Parameter Store SecureString; SQS delay 600 s, visibility 300 s, DLQ after 10 tries; processor batch size 1, timeout 30 s; `OWNER_MAX_TRIES = 6`; alert marker claimed with S3 conditional write (`IfNoneMatch="*"`); runtime code uses standard library + boto3 only | HTTP API cheaper/simpler; Parameter Store free; batch size 1 keeps one lead's failure from retrying others; maxReceiveCount > 6 keeps "owner missing" out of the DLQ; conditional write makes the alert claim atomic; no dependencies means a plain zip |
+| 2026-11-11 | Start Step 2 (local code + tests, no AWS) before SME approval arrives; PR #2 stays unmerged until approval | User expects approval; local code is cheap to change if the SMEs ask for changes. Nothing is deployed before approval |
+| 2026-11-11 | Add Step 8 (final): tutorial book like WistiaVideoAnalytics, at `~/Documents/DataEngineerBootcamp/Books/LeadRelay/`, kept local only (never in Git); hand-typed rebuild in `~/Documents/DataEngineerBootcamp/Practice/LeadRelay-rebuild/` | User decision: finish the project first, then learn every tool from the book and rebuild by hand |
+| 2026-11-12 | Terraform: local state (git-ignored); AWS provider ~> 6.0; Lambdas python3.13 arm64, one shared zip of src/, JSON log format; secrets created as write-only `value_wo` placeholders (`CHANGE_ME`), real values set by the user with the AWS CLI; processor role has `s3:ListBucket` so missing markers return 404 not 403; API stage throttled 20 rps / burst 50 with access logs | Single user and environment; secrets never in state or git; ListBucket needed for `read_marker()` to work on real S3 |
+| 2026-11-12 | Deploy (terraform apply) before SME approval | User's call: idle cost about zero, `terraform destroy` removes everything, SME changes can be applied in place |
+| 2026-11-12 | **SME approved the architecture.** Owner files live one day in `dea-lead-owner` (old samples 403); signature_key to be shared by the SME; Slack alerts go to our own test channel | SME review of the deck, video and docs |
 
 ## Change log
 
@@ -33,3 +38,11 @@
     (second `IfNoneMatch="*"` put fails with PreconditionFailed).
   - Gate added: Step 2 starts only after the user's SMEs approve the architecture and implementation plan.
     Design deck (17 slides with speaker notes as the video script) published for the review.
+  - Design deck now 18 slides (added "Why we named it LeadRelay"); video recorded and sent to the SMEs.
+  - Step 2 started at user's request before approval (branch `step2-local-code`).
+  - Step 8 (tutorial book) added as the final step.
+- 2026-11-12:
+  - Step 2 done (8 modules, 104 tests, local demo); PR #3.
+  - Step 3 Terraform written (27 resources; validate and plan clean; not applied); PR #4.
+  - Deployed (27 resources). Real AWS check: the S3 test event went through notification → 10 min delay → processor, ignored as designed.
+  - SME approved the architecture; open questions 1, 2, 4 answered (architecture.md section 7).

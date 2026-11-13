@@ -18,4 +18,7 @@ locals {
   name        = "leadrelay"
   account_id  = data.aws_caller_identity.current.account_id
   bucket_name = "${local.name}-${local.account_id}" # e.g. leadrelay-123456789012
+
+  receiver_name  = "${local.name}-receiver"
+  processor_name = "${local.name}-processor"
 }

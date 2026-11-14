@@ -31,70 +31,53 @@ If something keeps failing, after 10 tries the message moves to a dead-letter qu
 
 The key idea for parallelism: every lead has its own files, named by its lead ID, so two leads never write the same object. All of it is built with Terraform, and the secrets live in SSM Parameter Store, never in git.
 
-## Slide 4: A real lead, from Close to Slack
+## Slide 4: One real lead, followed from Close to Slack
 
-Now the live part. Everything I'm about to show is real Close traffic, not test data. Close is sending us roughly five new leads a minute right now.
+Now the live demo. Instead of scrolling through logs full of other leads, I'll follow ONE real lead through the whole system. I wrote a small read-only script for that: it picks the lead whose alert went out most recently, and shows only that lead's files in S3 and only that lead's lines in the two Lambda logs.
 
-[ON SCREEN: terminal in the LeadRelay folder.]
-
-First I'll tail the receiver Lambda's log for the last few minutes:
+[ON SCREEN: terminal in the LeadRelay folder. Make the font big.]
 
 ```bash
-aws logs tail /aws/lambda/leadrelay-receiver --since 5m --region us-east-1
+.venv/bin/python scripts/trace_lead.py --pause
 ```
 
-Every line is JSON. You can see "lead saved" lines, each with a lead ID and the step name "receive". You'll also see some "event ignored" lines: those are other Close events, such as lead updates, which we answer with 200 so Close doesn't retry, but don't store. What you should not see is any "bad signature" warning, because the real signing key is in place.
+The --pause flag stops after each step until I press Enter, so I can explain each one. The first line prints the lead ID we're following.
 
-Then the processor log, which shows the other end of the 10-minute wait:
+[If you want a specific lead instead, pass it: .venv/bin/python scripts/trace_lead.py --pause --lead-id PASTE_LEAD_ID]
 
-```bash
-aws logs tail /aws/lambda/leadrelay-processor --since 15m --region us-east-1
-```
+Next slide shows the six steps you're about to see.
 
-Pick one lead ID and follow it: "owner lookup done" with owner_found true, then "enriched record saved", then "alert sent". Notice the timestamps: the processor line is about 10 minutes after the receiver saved that lead. That's the SQS delay doing its job.
+## Slide 5: Six steps, one lead_id
 
-## Slide 5: Three files per lead, all named by lead_id
+[ON SCREEN: the script is running with --pause. Press Enter after explaining each step.]
 
-Next, the files in S3.
+Step 1, the receiver log. Only this lead's line: "lead saved", with the time. That means the signature check passed and it was a new-lead event.
 
-[ON SCREEN: terminal.]
+Step 2, the raw file in S3, source/crm_event_ plus the lead ID. It holds the Close event exactly as it arrived. The script shows three fields from it: name, created date and label.
 
-First I'll save the bucket name in a variable, then list the three folders:
+Step 3 is the most important one for the requirements. The script compares when the file was saved with the processor's first owner lookup. You should see about 10.0 minutes. That's the SQS delay: the lookup never happens early.
 
-```bash
-B=$(terraform -chdir=infra output -raw bucket_name)
-aws s3 ls s3://$B/source/ --region us-east-1 | tail -3
-aws s3 ls s3://$B/target/ --region us-east-1 | tail -3
-aws s3 ls s3://$B/alerts_sent/ --region us-east-1 | tail -3
-```
+Step 4, the processor log for this lead. "owner lookup done" with the try number and whether the owner was found. If the owner file wasn't there yet, you'll see try 1 with owner_found False, and then try 2 five minutes later with owner_found True. That's the retry policy in action. Then "enriched record saved" and "alert sent".
 
-source/ has the raw Close event for every lead we received, stored exactly as it arrived, so we can always replay it. target/ has the enriched record. alerts_sent/ has the marker that says this lead's alert already went out.
+Step 5, the enriched record in S3, target/enriched_ plus the lead ID: all seven alert fields in one record, plus owner_found.
 
-Now let's open one enriched record. I'll copy a lead ID from the target listing:
+Step 6, the alert marker, alerts_sent plus the lead ID, with status "sent". This marker is what stops a second alert for the same lead, even if SQS delivers the message twice. The script ends by printing the lead ID to search for in Slack.
 
-```bash
-aws s3 cp s3://$B/target/enriched_PASTE_LEAD_ID.json - --region us-east-1 | python3 -m json.tool
-```
+Why one file per lead ID? Fifty leads in the same second become fifty different files, so no two Lambdas ever write the same object.
 
-Here are the seven alert fields in one flat record, plus owner_found, which tells us whether the owner came from the lookup or the lead was alerted as unassigned, and a pointer back to the source file.
+## Slide 6: The same lead, as the sales team sees it
 
-Why one file per lead ID? Because then fifty leads in the same second are fifty different files. No two Lambdas ever write the same object, so there's nothing to race on. And if the same lead is processed twice, it just overwrites its own file with the same content.
+Last stop for this lead: Slack.
 
-## Slide 6: The alert the sales team sees
+[ON SCREEN: switch to the Slack channel. Paste the lead ID the script printed into Slack's search box. One alert comes up.]
 
-And here's what the sales team actually gets.
+Here's the alert for the same lead we just followed. Only one result for this lead ID: it was sent once.
 
-[ON SCREEN: switch to the Slack channel and scroll through the recent alerts.]
+[ON SCREEN: put the terminal and Slack side by side, or point at each field.]
 
-Each alert has the seven fields from the requirements, in that order. Name, lead ID, created date and label come from the Close event. Email, lead owner and funnel come from the owner lookup, done 10 minutes after the lead was created.
+Every field matches the enriched record from step 5: name, lead ID, created date and label from the Close event; email, lead owner and funnel from the owner lookup.
 
-[ON SCREEN: point at one alert, then find the same lead ID in the enriched record from the previous step.]
-
-This alert matches the enriched record I just opened in S3: same lead ID, same owner.
-
-If the owner still isn't in the lookup bucket after the sixth try, about 35 minutes after the lead arrived, we don't drop the lead. The alert goes out with Lead Owner set to UNASSIGNED, so someone can pick it up by hand. You'll see one of those in the numbers on the next slide.
-
-Every lead gets one alert, never two. Even if SQS delivers the same message twice, the alerts_sent marker stops the second copy.
+And if the owner had still been missing after the sixth try, about 35 minutes after the lead arrived, this alert would have gone out with Lead Owner set to UNASSIGNED, so no lead is ever silently dropped.
 
 ## Slide 7: Every lead accounted for, nothing in the DLQ
 

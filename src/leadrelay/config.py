@@ -14,6 +14,7 @@ code, git, Terraform files or the Lambda console.
 """
 
 import os
+import time
 from dataclasses import dataclass
 
 from leadrelay.lookup import OWNER_BASE_URL
@@ -73,20 +74,46 @@ class SecretStore:
     A Lambda container is reused for many invocations; create one SecretStore
     outside the handler and each secret is fetched only once per container
     ("cold start"), not once per lead.
+
+    When a secret may have changed in SSM (for example the Close signature key
+    was rotated), call refresh(name) to read it again. Refreshes of one name are
+    limited to one per REFRESH_MIN_SECONDS, so a flood of bad requests cannot
+    turn into a flood of SSM calls.
     """
 
-    def __init__(self, ssm_client):
+    REFRESH_MIN_SECONDS = 60
+
+    def __init__(self, ssm_client, clock=time.monotonic):
         self._ssm = ssm_client
+        self._clock = clock
         self._cache = {}
+        self._fetched_at = {}
 
     def get(self, name: str) -> str:
         if name not in self._cache:
-            try:
-                response = self._ssm.get_parameter(Name=name, WithDecryption=True)
-            except self._ssm.exceptions.ParameterNotFound:
-                raise ConfigError(f"SSM parameter {name} does not exist") from None
-            value = response["Parameter"]["Value"]
-            if value == PLACEHOLDER:
-                raise ConfigError(f"SSM parameter {name} still holds the placeholder; set the real value")
-            self._cache[name] = value
+            self._fetch(name)
         return self._cache[name]
+
+    def refresh(self, name: str) -> bool:
+        """Read `name` from SSM again. Returns True only if the value changed.
+
+        Skipped (returns False) if this name was read less than
+        REFRESH_MIN_SECONDS ago.
+        """
+        last = self._fetched_at.get(name)
+        if last is not None and self._clock() - last < self.REFRESH_MIN_SECONDS:
+            return False
+        old = self._cache.get(name)
+        self._fetch(name)
+        return self._cache[name] != old
+
+    def _fetch(self, name: str) -> None:
+        try:
+            response = self._ssm.get_parameter(Name=name, WithDecryption=True)
+        except self._ssm.exceptions.ParameterNotFound:
+            raise ConfigError(f"SSM parameter {name} does not exist") from None
+        value = response["Parameter"]["Value"]
+        if value == PLACEHOLDER:
+            raise ConfigError(f"SSM parameter {name} still holds the placeholder; set the real value")
+        self._cache[name] = value
+        self._fetched_at[name] = self._clock()

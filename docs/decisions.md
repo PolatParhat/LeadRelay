@@ -18,6 +18,8 @@
 | 2026-11-12 | **SME approved the architecture.** Owner files live one day in `dea-lead-owner` (old samples 403); signature_key to be shared by the SME; Slack alerts go to our own test channel | SME review of the deck, video and docs |
 | 2026-11-14 | Step 4 marked done after the real-AWS missing-owner test; the owner-found path is tested in Step 5 | It needs a real Close lead whose owner file exists (files live one day) |
 | 2026-11-14 | Step 5 done with the real Close subscription; Step 6 adds a signature-key refresh (re-read from SSM on a failed check, or a cache TTL) | Warm Lambdas kept the old cached key after the SSM update and rejected real events until a config change forced new environments |
+| 2026-11-14 | Step 6 hardening: (a) re-read the Close key from SSM on a failed signature check, rate-limited to once per 60 s per Lambda (chosen over a cache TTL); (b) CloudWatch DLQ alarm → SNS email, address in git-ignored `infra/terraform.tfvars`; (c) parallel tests in moto with threads, not a live 20-lead burst | (a) fixes rotation with no extra SSM calls on the happy path and caps cost of fake requests; (b) nobody noticed DLQ messages before; (c) a live burst would post 20 fake Slack alerts into real traffic |
+| 2026-11-14 | Final demo deck (13 slides, speaker notes = video script) published as an artifact like the design deck | User asked for speaker notes to wrap up |
 
 ## Change log
 
@@ -54,3 +56,8 @@
 - 2026-11-14:
   - Real Close signature_key stored in SSM (version 3). ~832 events rejected (11:50-14:51 UTC) because the old test key was cached in warm receiver Lambdas; fixed by adding env var `KEY_REFRESH` (forces new environments). 0 rejections after.
   - Real leads verified: 72 saved in ~14 min, first 24 processed with owner found on try 1, enriched, alerted on Slack; DLQ 0. Step 5 done.
+- 2026-11-14 (later):
+  - PR #5 merged. Step 6 (a/b/c) and Step 7 README on branch `step6-hardening`, PR #6 (not applied).
+  - pytest 111 passed; `terraform plan` 3 add / 2 change / 0 destroy.
+  - Real traffic 15:17 UTC: 92 received, 76 enriched + alerted (75 owner found, 1 UNASSIGNED), DLQ 0.
+  - Final demo deck published: https://claude.ai/artifact/VzswHsZxHVniRdcXToSxzy

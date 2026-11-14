@@ -28,3 +28,8 @@ output "set_secrets" {
     read -rs SECRET && aws ssm put-parameter --region ${var.region} --name ${aws_ssm_parameter.close_signature_key.name} --type SecureString --overwrite --value "$SECRET"; unset SECRET
   EOT
 }
+
+output "alarm_topic_arn" {
+  description = "SNS topic for alarms. If alarm_email is set, confirm the subscription email AWS sends you."
+  value       = aws_sns_topic.alarms.arn
+}

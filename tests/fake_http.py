@@ -4,6 +4,9 @@
     server.replies = [(500, b""), (200, b"ok")]   # answers given in this order
     ... code under test calls server.url ...
     server.requests                              # what the code sent us
+    server.responder = lambda method, path: (200, b"...")  # or: answer by request path
+
+Requests are handled one at a time, in the order they arrive.
 """
 
 import http.server
@@ -14,6 +17,7 @@ class FakeHttpServer:
     def __init__(self):
         self.replies = []   # list of (status, body) or (status, body, headers)
         self.requests = []  # list of {"method", "path", "headers", "body"}
+        self.responder = None  # optional function (method, path) -> reply; wins over `replies`
         fake = self
 
         class Handler(http.server.BaseHTTPRequestHandler):
@@ -25,7 +29,10 @@ class FakeHttpServer:
                     "headers": dict(self.headers),
                     "body": self.rfile.read(length),
                 })
-                reply = fake.replies.pop(0) if fake.replies else (403, b"")
+                if fake.responder is not None:
+                    reply = fake.responder(self.command, self.path)
+                else:
+                    reply = fake.replies.pop(0) if fake.replies else (403, b"")
                 status, body, headers = (reply + ({},))[:3]
                 self.send_response(status)
                 for name, value in headers.items():

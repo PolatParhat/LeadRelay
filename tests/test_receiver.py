@@ -85,6 +85,28 @@ def test_bad_signature_is_401_and_saves_nothing(aws):
     assert saved_keys(aws) == []
 
 
+def test_rotated_key_is_picked_up_without_restart(aws):
+    s3, secrets, settings = aws
+    secrets.REFRESH_MIN_SECONDS = 0  # let this test refresh right away
+    assert call(aws, webhook()) == (200, "saved")  # old key now cached
+    new_key = "0f" * 32
+    secrets._ssm.put_parameter(Name="/leadrelay/close_signature_key", Value=new_key,
+                               Type="SecureString", Overwrite=True)
+    other = json.loads(json.dumps(BODY))
+    other["event"]["lead_id"] = "lead_rotated123"
+    assert call(aws, webhook(body=other, key=new_key)) == (200, "saved")
+
+
+def test_bad_signature_does_not_reload_key_more_than_once_a_minute(aws):
+    s3, secrets, settings = aws
+    calls = []
+    real_get = secrets._ssm.get_parameter
+    secrets._ssm.get_parameter = lambda **kw: calls.append(1) or real_get(**kw)
+    for _ in range(5):
+        assert call(aws, webhook(key="ff" * 32)) == (401, "invalid signature")
+    assert len(calls) == 1  # first read only; refreshes within 60 s are skipped
+
+
 def test_old_timestamp_is_401(aws):
     assert call(aws, webhook(ts=str(NOW - 600))) == (401, "invalid signature")
 

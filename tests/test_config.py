@@ -75,3 +75,42 @@ def test_placeholder_secret_raises_config_error(ssm):
     ssm.put_parameter(Name="/leadrelay/k", Value="CHANGE_ME", Type="SecureString")
     with pytest.raises(ConfigError, match="placeholder"):
         SecretStore(ssm).get("/leadrelay/k")
+
+
+class FakeClock:
+    def __init__(self):
+        self.now = 1000.0
+
+    def __call__(self):
+        return self.now
+
+
+def test_refresh_picks_up_a_changed_secret(ssm):
+    ssm.put_parameter(Name="/leadrelay/k", Value="first", Type="SecureString")
+    clock = FakeClock()
+    store = SecretStore(ssm, clock=clock)
+    store.get("/leadrelay/k")
+    ssm.put_parameter(Name="/leadrelay/k", Value="second", Type="SecureString", Overwrite=True)
+    clock.now += SecretStore.REFRESH_MIN_SECONDS
+    assert store.refresh("/leadrelay/k") is True
+    assert store.get("/leadrelay/k") == "second"
+
+
+def test_refresh_returns_false_when_secret_is_unchanged(ssm):
+    ssm.put_parameter(Name="/leadrelay/k", Value="same", Type="SecureString")
+    clock = FakeClock()
+    store = SecretStore(ssm, clock=clock)
+    store.get("/leadrelay/k")
+    clock.now += SecretStore.REFRESH_MIN_SECONDS
+    assert store.refresh("/leadrelay/k") is False
+
+
+def test_refresh_is_rate_limited(ssm):
+    ssm.put_parameter(Name="/leadrelay/k", Value="first", Type="SecureString")
+    clock = FakeClock()
+    store = SecretStore(ssm, clock=clock)
+    store.get("/leadrelay/k")
+    ssm.put_parameter(Name="/leadrelay/k", Value="second", Type="SecureString", Overwrite=True)
+    clock.now += SecretStore.REFRESH_MIN_SECONDS - 1
+    assert store.refresh("/leadrelay/k") is False  # too soon: SSM not called
+    assert store.get("/leadrelay/k") == "first"

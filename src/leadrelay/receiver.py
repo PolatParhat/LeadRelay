@@ -54,11 +54,18 @@ def handle(event, settings, s3, secrets, now=None) -> dict:
 
     # 1. Signature first, on the body exactly as received.
     headers = {name.lower(): value for name, value in (event.get("headers") or {}).items()}
-    key = secrets.get(settings.signature_key_param)
-    if not is_valid_signature(key, headers.get("close-sig-timestamp"),
-                              headers.get("close-sig-hash"), raw_body, now=now):
-        log.warning("bad signature, request rejected", extra={"step": "receive"})
-        return _reply(401, "invalid signature")
+    def signature_ok(key):
+        return is_valid_signature(key, headers.get("close-sig-timestamp"),
+                                  headers.get("close-sig-hash"), raw_body, now=now)
+
+    if not signature_ok(secrets.get(settings.signature_key_param)):
+        # Maybe the key was rotated in SSM after this container cached it:
+        # re-read it once (rate-limited inside SecretStore) and check again.
+        if not (secrets.refresh(settings.signature_key_param)
+                and signature_ok(secrets.get(settings.signature_key_param))):
+            log.warning("bad signature, request rejected", extra={"step": "receive"})
+            return _reply(401, "invalid signature")
+        log.info("signature key reloaded from SSM", extra={"step": "receive"})
 
     # 2. Parse.
     try:

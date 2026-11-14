@@ -16,6 +16,7 @@
 | 2026-11-12 | Terraform: local state (git-ignored); AWS provider ~> 6.0; Lambdas python3.13 arm64, one shared zip of src/, JSON log format; secrets created as write-only `value_wo` placeholders (`CHANGE_ME`), real values set by the user with the AWS CLI; processor role has `s3:ListBucket` so missing markers return 404 not 403; API stage throttled 20 rps / burst 50 with access logs | Single user and environment; secrets never in state or git; ListBucket needed for `read_marker()` to work on real S3 |
 | 2026-11-12 | Deploy (terraform apply) before SME approval | User's call: idle cost about zero, `terraform destroy` removes everything, SME changes can be applied in place |
 | 2026-11-12 | **SME approved the architecture.** Owner files live one day in `dea-lead-owner` (old samples 403); signature_key to be shared by the SME; Slack alerts go to our own test channel | SME review of the deck, video and docs |
+| 2026-11-14 | Step 4 marked done after the real-AWS missing-owner test; the owner-found path is tested in Step 5 | It needs a real Close lead whose owner file exists (files live one day) |
 
 ## Change log
 
@@ -46,3 +47,6 @@
   - Step 3 Terraform written (27 resources; validate and plan clean; not applied); PR #4.
   - Deployed (27 resources). Real AWS check: the S3 test event went through notification → 10 min delay → processor, ignored as designed.
   - SME approved the architecture; open questions 1, 2, 4 answered (architecture.md section 7).
+  - PR #2 and PR #4 merged (PR #3 closed when its base branch was deleted; retargeted #4 to main).
+- 2026-11-13:
+  - Real AWS end-to-end test passed: receiver 200/401/ignored; test lead retried 5 times every 5 min after the 10-min delay, then UNASSIGNED alert sent to Slack; enriched record and sent marker in S3; DLQ empty. Step 4 done.

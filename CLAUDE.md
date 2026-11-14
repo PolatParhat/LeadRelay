@@ -28,9 +28,9 @@ State: STATUS.md · History: docs/decisions.md (read it before re-deciding anyth
 | 3 | Infrastructure as code (bucket, queues + DLQ, Lambdas, API Gateway, notification) | Done (PR #4, applied) |
 | 4 | User deploys; end-to-end test with curl | Done 2026-11-13 |
 | 5 | Real Close webhook subscription via Azmat/Ninad | Done 2026-11-14 |
-| 6 | Hardening: retries, DLQ, logging, parallel-leads test | Code done (PR #6); apply pending |
-| 7 | README + architecture diagram, demo video, teardown | README + demo deck done; video, teardown to do |
-| 8 | FINAL: local-only tutorial book (every tool from a data-engineering view, examples + runnable labs, project walkthrough, rebuild guide), same format as WistiaVideoAnalytics | To do (after teardown) |
+| 6 | Hardening: retries, DLQ, logging, parallel-leads test | Done 2026-11-14 (PR #6, applied) |
+| 7 | README + architecture diagram, demo video, teardown | Done 2026-11-14 (video recorded, stack destroyed) |
+| 8 | FINAL: local-only tutorial book (every tool from a data-engineering view, examples + runnable labs, project walkthrough, rebuild guide), same format as WistiaVideoAnalytics | Done 2026-11-14 (~/Documents/DataEngineerBootcamp/Books/LeadRelay) |
 
 ## Key facts (a fresh session must not get these wrong)
 

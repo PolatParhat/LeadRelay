@@ -61,3 +61,11 @@
   - pytest 111 passed; `terraform plan` 3 add / 2 change / 0 destroy.
   - Real traffic 15:17 UTC: 92 received, 76 enriched + alerted (75 owner found, 1 UNASSIGNED), DLQ 0.
   - Final demo deck published: https://claude.ai/artifact/VzswHsZxHVniRdcXToSxzy
+- 2026-11-14 (final):
+  - Step 6 applied (alarm live, receiver key refresh deployed). PR #7: `scripts/trace_lead.py` (follow one lead,
+    read-only) after the first demo draft tailed whole logs and was hard to follow.
+  - Final demo video recorded; message to the SMEs drafted (asks them to delete the Close subscription).
+  - Teardown: `terraform destroy` (30 resources); verified state empty, no leadrelay bucket or Lambdas.
+  - Step 8: tutorial book at ~/Documents/DataEngineerBootcamp/Books/LeadRelay (17 chapters, 16 labs all
+    passing, HTML build, both speaker-note scripts); local only, never in Git.
+

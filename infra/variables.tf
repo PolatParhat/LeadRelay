@@ -36,3 +36,9 @@ variable "max_receive_count" {
   type        = number
   default     = 10
 }
+
+variable "alarm_email" {
+  description = "Email that receives DLQ alarms. Set it in infra/terraform.tfvars (git-ignored). Empty = no email subscription."
+  type        = string
+  default     = ""
+}

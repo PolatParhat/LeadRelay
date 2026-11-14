@@ -24,10 +24,10 @@ State: STATUS.md · History: docs/decisions.md (read it before re-deciding anyth
 |---|---|---|
 | 0 | Project scaffold | Done |
 | 1 | Architecture + decisions (Slack/email, IaC tool, bucket/folder/file names, missing-owner policy) | Done, SME approved 2026-11-12 |
-| 2 | Local code + pytest, no AWS (receiver, lookup, enrich, alert modules) | Done (PR #3) |
-| 3 | Infrastructure as code (bucket, queues + DLQ, Lambdas, API Gateway, notification) | Done (PR #4, not applied) |
-| 4 | User deploys; end-to-end test with curl | In progress |
-| 5 | Real Close webhook subscription via Azmat/Ninad | To do |
+| 2 | Local code + pytest, no AWS (receiver, lookup, enrich, alert modules) | Done (merged via PR #4) |
+| 3 | Infrastructure as code (bucket, queues + DLQ, Lambdas, API Gateway, notification) | Done (PR #4, applied) |
+| 4 | User deploys; end-to-end test with curl | Done 2026-11-13 |
+| 5 | Real Close webhook subscription via Azmat/Ninad | Done 2026-11-14 |
 | 6 | Hardening: retries, DLQ, logging, parallel-leads test | To do |
 | 7 | README + architecture diagram, demo video, teardown | To do |
 | 8 | FINAL: local-only tutorial book (every tool from a data-engineering view, examples + runnable labs, project walkthrough, rebuild guide), same format as WistiaVideoAnalytics | To do (after teardown) |

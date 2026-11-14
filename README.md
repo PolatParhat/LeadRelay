@@ -96,6 +96,8 @@ After the apply:
 ### Test it
 
 ```bash
+.venv/bin/python scripts/trace_lead.py                       # follow the latest alerted lead end to end
+.venv/bin/python scripts/trace_lead.py --lead-id lead_abc    # or one lead you choose
 .venv/bin/python scripts/send_test_lead.py --bad-signature   # expect 401: signature check works
 aws logs tail /aws/lambda/leadrelay-receiver --since 10m --region us-east-1
 aws logs tail /aws/lambda/leadrelay-processor --since 30m --region us-east-1

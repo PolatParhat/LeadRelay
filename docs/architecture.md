@@ -129,7 +129,9 @@ Incoming webhook URL from SSM Parameter Store. Message text (Slack `mrkdwn`):
 
 Free (standard tier), encrypted. Terraform creates each parameter with a placeholder and ignores
 later value changes; the user sets the real values with the AWS CLI, so secrets never enter git or
-Terraform files. Lambdas read them once per cold start and cache them.
+Terraform files. Lambdas read them once per cold start and cache them. When a signature check fails, the
+receiver re-reads the Close key from SSM (at most once per 60 s per Lambda environment) and checks again,
+so rotating the key needs no Lambda restart (added in Step 6 after a real rotation got stuck on the cached key).
 
 ## 3. Enriched record (`target/enriched_{lead_id}.json`)
 
@@ -188,7 +190,10 @@ in parallel. Slack's webhook limit (about 1 message per second) is handled by th
   standard `logging` then writes JSON, and fields passed as `extra={"lead_id": ...}` become JSON keys.
   No logging library needed.
 - Levels: INFO normal flow, WARNING unassigned owner / bad signature, ERROR failures.
-- Step 6 (hardening) adds a CloudWatch alarm when the DLQ holds any message.
+- CloudWatch alarm `leadrelay-dlq-not-empty`: fires when the DLQ holds any message and emails
+  `alarm_email` through the SNS topic `leadrelay-alarms` (an "OK" email follows when it is empty again).
+- Parallel safety is tested in `tests/test_parallel.py`: 20 leads through the receiver and processor
+  at once (20 correct files and alerts), and 10 racing copies of one lead (exactly one alert).
 
 ## 6. Code layout (Step 2)
 
